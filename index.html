@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>جدول الأدوية اليومي التفاعلي</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f0f7ff;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .container {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        h1 {
+            color: #2c5aa0;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        h2 {
+            color: #2c5aa0;
+            font-size: 22px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        h3 {
+            color: #3a6bc2;
+            font-size: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .time-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #f8fbff;
+            border-right: 5px solid #3a6bc2;
+        }
+        
+        .medication-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 15px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s ease;
+        }
+        
+        .medication-item:hover {
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .medication-item.checked {
+            background-color: #f0fff0;
+            border-color: #4caf50;
+        }
+        
+        .checkbox-container {
+            margin-left: 15px;
+        }
+        
+        .checkbox-container input {
+            display: none;
+        }
+        
+        .checkmark {
+            width: 28px;
+            height: 28px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .checkmark.checked {
+            background-color: #4caf50;
+            border-color: #4caf50;
+            color: white;
+        }
+        
+        .medication-details {
+            flex: 1;
+        }
+        
+        .medication-name {
+            font-weight: bold;
+            font-size: 18px;
+            color: #2c5aa0;
+            margin-bottom: 5px;
+        }
+        
+        .medication-dosage {
+            color: #666;
+            font-size: 16px;
+        }
+        
+        .notes {
+            margin-top: 5px;
+            font-size: 14px;
+            color: #888;
+            font-style: italic;
+        }
+        
+        .important-notes {
+            background-color: #fff8f8;
+            border: 2px solid #ff6b6b;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+        
+        .important-notes h2 {
+            color: #d32f2f;
+        }
+        
+        .important-note-item {
+            background-color: white;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border-right: 4px solid #ff6b6b;
+        }
+        
+        .progress-section {
+            margin-top: 40px;
+            padding: 25px;
+            background-color: #f0f9ff;
+            border-radius: 10px;
+        }
+        
+        .progress-bar {
+            height: 25px;
+            background-color: #e0e0e0;
+            border-radius: 12px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background-color: #4caf50;
+            width: 0%;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .progress-text {
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        
+        .reminders-section {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+        }
+        
+        .reminder-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 15px;
+            background-color: white;
+            border-radius: 10px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .reminder-time {
+            font-weight: bold;
+            font-size: 18px;
+            color: #2c5aa0;
+        }
+        
+        .reminder-medications {
+            color: #666;
+        }
+        
+        .reminder-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        button {
+            padding: 10px 20px;
+            background-color: #3a6bc2;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        
+        button:hover {
+            background-color: #2c5aa0;
+        }
+        
+        .button-small {
+            padding: 5px 10px;
+            font-size: 14px;
+        }
+        
+        .reset-btn {
+            background-color: #ff6b6b;
+            margin-left: 10px;
+        }
+        
+        .reset-btn:hover {
+            background-color: #d32f2f;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            gap: 15px;
+        }
+        
+        .time-icon {
+            background-color: #3a6bc2;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        
+        @media (max-width: 768px) {
+            .medication-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .checkbox-container {
+                margin-left: 0;
+                margin-bottom: 10px;
+            }
+            
+            .reminder-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .reminder-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+        }
+        
+        .save-notification {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background-color: #4caf50;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            display: none;
+            z-index: 1000;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #777;
+            font-size: 14px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .instructions {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 15px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-pills"></i> جدول الأدوية اليومي التفاعلي</h1>
+            <p>تابع أدويتك اليومية وسجل الجرعات التي تناولتها</p>
+        </header>
+        
+        <div class="instructions">
+            <p><i class="fas fa-info-circle"></i> التعليمات: اضغط على مربع الاختيار بجانب كل دواء بعد تناوله. سيتم حفظ تقدمك تلقائيًا ويمكن لأي شخص عرض الحالة عبر الإنترنت.</p>
+        </div>
+        
+        <!-- الصباح على الريق -->
+        <div class="time-section">
+            <h3><span class="time-icon"><i class="fas fa-sun"></i></span> صباحًا على الريق</h3>
+            
+            <div class="medication-item" data-medication="Examide">
+                <div class="checkbox-container">
+                    <div class="checkmark"><i class="fas fa-check"></i></div>
+                    <input type="checkbox" class="medication-checkbox">
+                </div>
+                <div class="medication-details">
+                    <div class="medication-name">Examide 20 mg</div>
+                    <div class="medication-dosage">الجرعة: قرص واحد</div>
+                </div>
+            </div>
+            
+            <div class="medication-item" data-medication="Norvasc">
+                <div class="checkbox-container">
+                    <div class="checkmark"><i class="fas fa-check"></i></div>
+                    <input type="checkbox" class="medication-checkbox">
+                </div>
+                <div class="medication-details">
+                    <div class="medication-name">Norvasc 10 mg</div>
+                    <div class="medication-dosage">الجرعة: قرص واحد</div>
+                </div>
+            </div>
+            
+            <div class="medication-item" data-medication="Contoloc">
+                <div class="checkbox-container">
+                    <div class="checkmark"><i class="fas fa-check"></i></div>
+                    <input type="checkbox" class="medication-checkbox">
+                </div>
+                <div class="medication-details">
+                    <div class="medication-name">Contoloc 40 mg</div>
+                    <div class="medication-dosage">الجرعة: قرص واحد</div>
+                </div>
+            </div>
+            
+            <div class="medication-item" data-medication="Corvid">
+                <div class="checkbox-container">
+                    <div class="checkmark"><i class="fas fa-check"></i></div>
+                    <input type="checkbox" class="medication-checkbox">
+                </div>
+                <div class="medication-details">
+                    <div class="medication-name">Corvid 6.25 mg</div>
+                    <div class="medication-dosage">الجرعة: نصف قرص</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- بعد الفطور -->
+        <div class="time-section">
+            <h3><span class="time-icon"><i class="fas fa-coffee"></i></span> بعد الفطار</h3>
+            
+            <div class="medication-item" data-medication="Aldomet">
+                <div class="checkbox-container">
+                    <div class="checkmark"><i class="fas fa-check"></i></div>
+                    <input type="checkbox" class="medication-checkbox">
+                </div>
+                <div class="medication-details">
+                    <div class="medication-name">Aldomet 250 mg</div>
+                    <div class="medication-dosage">الجرعة: قرصين</div>
+                </div>
+            </div>
+            
+            <div class="medication-item" data-medication="Eliquis">
+                <div class="checkbox-container">
+                    <div class="checkmark"><i class="fas fa-check"></i></div>
+                    <input type="checkbox" class="medication-checkbox">
+                </div>
+                <div class="medication-details">
+                    <div class="medication-name">Eliquis 2.5 mg</div>
+                    <div class="medication-dosage">الجرعة: قرص واحد</div>
+                    <div class="notes">مع Plavix: ممنوع نسيان أو إيقاف بدون طبيب</div>
+                </div>
+            </div>
+            
+            <div class="medication-item" data-medication="Covapraviv">
+                <div class="checkbox-container">
+                    <div class="checkmark"><i class="fas fa-check"></i></div>
+                    <input type="checkbox" class="medication-checkbox">
+                </div>
+                <div class="medication-details">
+                    <div class="medication-name">Covapraviv 200 mg</div>
+                    <div class="medication-dosage">الجرعة: 4 أقراص (كل 12 ساعة – لحين انتهاء الجرعة)</div>
+                </div>
+            </div>
+            
+            <div class="medication-item" data-medication="Acetyl Cysteine">
+                <div class="checkbox-container">
+                    <div class="checkmark"><i class="fas fa-check"></i></div>
+                    <input type="checkbox" class="medication-checkbox">
+                </div>
+                <div class="medication-details">
+                    <div class="medication-name">Acetyl Cysteine sachet</div>
+                    <div class="medication-dosage">الجرعة: كيس واحد</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- قبل الغداء -->
+        <div class="time-section">
+            <h3><span class="time-icon"><i class="fas fa-utensils"></i></span> قبل الغداء</h3>
+            
+            <div class="medication-item" data-medication="Forxiga">
+                <div class="checkbox-container">
+                    <div class="checkmark"><i class="fas fa-check"></i></div>
+                    <input type="checkbox" class="medication-checkbox">
+                </div>
+                <div class="medication-details">
+                    <div class="medication-name">Forxiga 10 mg</div>
+                    <div class="medication-dosage">الجرعة: قرص واحد</div>
+                    <div class="notes">اشرب مياه كويس وراقب السكر</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- بعد الغداء -->
+        <div class="time-section">
+            <h3><span class="time-icon"><i class="fas fa-utensils"></i></span> بعد الغداء</h3>
+            
+            <div class="medication-item" data-medication="Suprax">
+                <div class="checkbox-container">
+                    <div class="checkmark"><i class="fas fa-check"></i></div>
+                    <input type="checkbox" class="medication-checkbox">
+                </div>
+                <div class="medication-details">
+                    <div class="medication-name">Suprax 200 mg</div>
+                    <div class="medication-dosage">الجرعة: قرص واحد (لمدة أسبوع)</div>
+                </div>
+            </div>
+            
+            <div class="medication-item" data-medication="Suprax Suspension">
+                <div class="checkbox-container">
+                    <div class="checkmark"><i class="fas fa-check"></i></div>
+                    <input type="checkbox" class="medication-checkbox">
+                </div>
+                <div class="medication-details">
+                    <div class="medication-name">Suprax Suspension</div>
+                    <div class="medication-dosage">الجرعة: ٣ سم بعد الغداء لمدة اسبوع</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- عصرًا -->
+        <div class="time-section">
+            <h3><span class="time-icon"><i class="fas fa-sun"></i></span> عصرًا</h3>
+            
+            <div class="medication-item" data-medication="Eraloner">
+                <div class="checkbox-container">
+                    <div class="checkmark"><i class="fas fa-check"></i></div>
+                    <input type="checkbox" class="medication-checkbox">
+                </div>
+                <div class="medication-details">
+                    <div class="medication-name">Eraloner 25 mg</div>
+                    <div class="medication-dosage">الجرعة: قرص واحد</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- الساعة 6 مساءً -->
+        <div class="time-section">
+            <h3><span class="time-icon"><i class="fas fa-clock"></i></span> الساعة 6 مساءً</h3>
+            
+            <div class="medication-item" data-medication="Cardura">
+                <div class="checkbox-container">
+                    <div class="checkmark"><i class="fas fa-check"></i></div>
+                    <input type="checkbox" class="medication-checkbox">
+                </div>
+                <div class="medication-details">
+                    <div class="medication-name">Cardura 4 mg</div>
+                    <div class="medication-dosage">الجرعة: قرص واحد</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- بعد العشاء -->
+        <div class="time-section">
+            <h3><span class="time-icon"><i class="fas fa-moon"></i></span> بعد العشاء</h3>
+            
+            <div class="medication-item" data-medication="Plavix">
+                <div class="checkbox-container">
+                    <div class="checkmark"><i class="fas fa-check"></i></div>
+                    <input type="checkbox" class="medication-checkbox">
+                </div>
+                <div class="medication-details">
+                    <div class="medication-name">Plavix 75 mg</div>
+                    <div class="medication-dosage">الجرعة: قرص واحد</div>
+                    <div class="notes">مع Eliquis: ممنوع نسيان أو إيقاف بدون طبيب</div>
+                </div>
+            </div>
+            
+            <div class="medication-item" data-medication="Lipitor">
+                <div class="checkbox-container">
+                    <div class="checkmark"><i class="fas fa-check"></i></div>
+                    <input type="checkbox" class="medication-checkbox">
+                </div>
+                <div class="medication-details">
+                    <div class="medication-name">Lipitor 40 mg</div>
+                    <div class="medication-dosage">الجرعة: قرص واحد</div>
+                </div>
+            </div>
+            
+            <div class="medication-item" data-medication="Moxiflox">
+                <div class="checkbox-container">
+                    <div class="checkmark"><i class="fas fa-check"></i></div>
+                    <input type="checkbox" class="medication-checkbox">
+                </div>
+                <div class="medication-details">
+                    <div class="medication-name">Moxiflox</div>
+                    <div class="medication-dosage">الجرعة: قرص واحد (مرة كل 24 ساعة – لمدة 5 أيام)</div>
+                    <div class="notes">يتاخد في نفس المعاد يوميًا بعيد عن اللبن ومضادات الحموضة</div>
+                </div>
+            </div>
+            
+            <div class="medication-item" data-medication="Spiriva">
+                <div class="checkbox-container">
+                    <div class="checkmark"><i class="fas fa-check"></i></div>
+                    <input type="checkbox" class="medication-checkbox">
+                </div>
+                <div class="medication-details">
+                    <div class="medication-name">Spiriva 18 mcg inhaler</div>
+                    <div class="medication-dosage">الجرعة: بخة واحدة</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- قبل النوم -->
+        <div class="time-section">
+            <h3><span class="time-icon"><i class="fas fa-bed"></i></span> قبل النوم (بعد 12 ساعة من جرعة الصباح)</h3>
+            
+            <div class="medication-item" data-medication="Eliquis Night">
+                <div class="checkbox-container">
+                    <div class="checkmark"><i class="fas fa-check"></i></div>
+                    <input type="checkbox" class="medication-checkbox">
+                </div>
+                <div class="medication-details">
+                    <div class="medication-name">Eliquis 2.5 mg</div>
+                    <div class="medication-dosage">الجرعة: قرص واحد</div>
+                </div>
+            </div>
+            
+            <div class="medication-item" data-medication="Aldomet Night">
+                <div class="checkbox-container">
+                    <div class="checkmark"><i class="fas fa-check"></i></div>
+                    <input type="checkbox" class="medication-checkbox">
+                </div>
+                <div class="medication-details">
+                    <div class="medication-name">Aldomet 250 mg</div>
+                    <div class="medication-dosage">الجرعة: قرصين</div>
+                </div>
+            </div>
+            
+            <div class="medication-item" data-medication="Covapraviv Night">
+                <div class="checkbox-container">
+                    <div class="checkmark"><i class="fas fa-check"></i></div>
+                    <input type="checkbox" class="medication-checkbox">
+                </div>
+                <div class="medication-details">
+                    <div class="medication-name">Covapraviv 200 mg</div>
+                    <div class="medication-dosage">الجرعة: 4 أقراص</div>
+                </div>
+            </div>
+            
+            <div class="medication-item" data-medication="Acetyl Cysteine Night">
+                <div class="checkbox-container">
+                    <div class="checkmark"><i class="fas fa-check"></i></div>
+                    <input type="checkbox" class="medication-checkbox">
+                </div>
+                <div class="medication-details">
+                    <div class="medication-name">Acetyl Cysteine sachet</div>
+                    <div class="medication-dosage">الجرعة: كيس واحد</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- جرعة منتصف اليوم -->
+        <div class="time-section">
+            <h3><span class="time-icon"><i class="fas fa-clock"></i></span> جرعة منتصف اليوم (بعد 8 ساعات من الصباح)</h3>
+            <div class="medication-item" data-medication="Aldomet Midday">
+                <div class="checkbox-container">
+                    <div class="checkmark"><i class="fas fa-check"></i></div>
+                    <input type="checkbox" class="medication-checkbox">
+                </div>
+                <div class="medication-details">
+                    <div class="medication-name">Aldomet 250 mg</div>
+                    <div class="medication-dosage">الجرعة: قرصين 🔁 كل 8 ساعات (3 مرات يوميًا)</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- الملاحظات المهمة -->
+        <div class="important-notes">
+            <h2><i class="fas fa-exclamation-triangle"></i> ملاحظات مهمة جدًا</h2>
+            
+            <div class="important-note-item">
+                <p><strong>Eliquis + Plavix:</strong> ممنوع نسيان أو إيقاف بدون طبيب (خطر جلطة/نزيف).</p>
+            </div>
+            
+            <div class="important-note-item">
+                <p><strong>Moxiflox:</strong> يتاخد في نفس المعاد يوميًا بعيد عن اللبن ومضادات الحموضة.</p>
+            </div>
+            
+            <div class="important-note-item">
+                <p><strong>Forxiga:</strong> اشرب مياه كويس وراقب السكر.</p>
+            </div>
+            
+            <div class="important-note-item">
+                <p><strong>تنبيه هام:</strong> لو في دوخة شديدة / هبوط / نزيف → طوارئ فورًا.</p>
+            </div>
+        </div>
+        
+        <!-- التقدم العام -->
+        <div class="progress-section">
+            <h2><i class="fas fa-chart-line"></i> التقدم اليومي</h2>
+            
+            <div class="progress-text">
+                تم تناول <span id="completed-count">0</span> من أصل <span id="total-count">0</span> دواء (<span id="progress-percentage">0%</span>)
+            </div>
+            
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill">0%</div>
+            </div>
+            
+            <div class="controls">
+                <button id="reset-day">إعادة تعيين اليوم</button>
+                <button id="save-data" class="reset-btn">حفظ البيانات</button>
+            </div>
+        </div>
+        
+        <!-- التذكيرات -->
+        <div class="reminders-section">
+            <h2><i class="fas fa-bell"></i> تذكير بالمواعيد</h2>
+            <p>اضغط على زر "تذكيرني" لضبط تذكير للمواعيد المهمة.</p>
+            
+            <div class="reminder-item">
+                <div>
+                    <div class="reminder-time">صباحًا على الريق</div>
+                    <div class="reminder-medications">Examide, Norvasc, Contoloc, Corvid</div>
+                </div>
+                <div class="reminder-actions">
+                    <button class="button-small set-reminder" data-time="morning">تذكيرني</button>
+                </div>
+            </div>
+            
+            <div class="reminder-item">
+                <div>
+                    <div class="reminder-time">بعد الفطار</div>
+                    <div class="reminder-medications">Aldomet, Eliquis, Covapraviv, Acetyl Cysteine</div>
+                </div>
+                <div class="reminder-actions">
+                    <button class="button-small set-reminder" data-time="breakfast">تذكيرني</button>
+                </div>
+            </div>
+            
+            <div class="reminder-item">
+                <div>
+                    <div class="reminder-time">قبل الغداء</div>
+                    <div class="reminder-medications">Forxiga</div>
+                </div>
+                <div class="reminder-actions">
+                    <button class="button-small set-reminder" data-time="lunch-before">تذكيرني</button>
+                </div>
+            </div>
+            
+            <div class="reminder-item">
+                <div>
+                    <div class="reminder-time">بعد العشاء</div>
+                    <div class="reminder-medications">Plavix, Lipitor, Moxiflox, Spiriva</div>
+                </div>
+                <div class="reminder-actions">
+                    <button class="button-small set-reminder" data-time="dinner-after">تذكيرني</button>
+                </div>
+            </div>
+            
+            <div class="reminder-item">
+                <div>
+                    <div class="reminder-time">قبل النوم</div>
+                    <div class="reminder-medications">Eliquis, Aldomet, Covapraviv, Acetyl Cysteine</div>
+                </div>
+                <div class="reminder-actions">
+                    <button class="button-small set-reminder" data-time="night">تذكيرني</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- إشعار الحفظ -->
+        <div class="save-notification" id="save-notification">
+            <i class="fas fa-check-circle"></i> تم حفظ بياناتك بنجاح!
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>تم تصميم هذا الجدول للاستخدام عبر الإنترنت - يمكن لأي شخص مع الرابط عرض حالة الأدوية</p>
+        <p>يتم حفظ البيانات تلقائيًا في المتصفح | آخر تحديث: <span id="last-update">اليوم</span></p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // عناصر DOM
+            const medicationItems = document.querySelectorAll('.medication-item');
+            const checkboxes = document.querySelectorAll('.medication-checkbox');
+            const checkmarks = document.querySelectorAll('.checkmark');
+            const resetButton = document.getElementById('reset-day');
+            const saveButton = document.getElementById('save-data');
+            const saveNotification = document.getElementById('save-notification');
+            const completedCount = document.getElementById('completed-count');
+            const totalCount = document.getElementById('total-count');
+            const progressPercentage = document.getElementById('progress-percentage');
+            const progressFill = document.getElementById('progress-fill');
+            const lastUpdate = document.getElementById('last-update');
+            const setReminderButtons = document.querySelectorAll('.set-reminder');
+            
+            // عدد الأدوية الكلي
+            const totalMedications = medicationItems.length;
+            totalCount.textContent = totalMedications;
+            
+            // تحميل البيانات المحفوظة
+            function loadSavedData() {
+                const savedData = localStorage.getItem('medicationTracker');
+                if (savedData) {
+                    const data = JSON.parse(savedData);
+                    
+                    // تحميل حالة الأدوية
+                    if (data.medications) {
+                        medicationItems.forEach(item => {
+                            const medName = item.getAttribute('data-medication');
+                            if (data.medications[medName]) {
+                                const checkbox = item.querySelector('.medication-checkbox');
+                                checkbox.checked = true;
+                                item.classList.add('checked');
+                                item.querySelector('.checkmark').classList.add('checked');
+                            }
+                        });
+                    }
+                    
+                    // تحديث تاريخ التحديث الأخير
+                    if (data.lastUpdate) {
+                        lastUpdate.textContent = new Date(data.lastUpdate).toLocaleString('ar-EG');
+                    }
+                    
+                    updateProgress();
+                }
+            }
+            
+            // حفظ البيانات
+            function saveData() {
+                const medications = {};
+                
+                medicationItems.forEach(item => {
+                    const medName = item.getAttribute('data-medication');
+                    const checkbox = item.querySelector('.medication-checkbox');
+                    medications[medName] = checkbox.checked;
+                });
+                
+                const data = {
+                    medications: medications,
+                    lastUpdate: new Date().toISOString(),
+                    progress: calculateProgress()
+                };
+                
+                localStorage.setItem('medicationTracker', JSON.stringify(data));
+                
+                // إظهار إشعار الحفظ
+                saveNotification.style.display = 'block';
+                setTimeout(() => {
+                    saveNotification.style.display = 'none';
+                }, 3000);
+                
+                // تحديث تاريخ التحديث الأخير
+                lastUpdate.textContent = new Date().toLocaleString('ar-EG');
+            }
+            
+            // حساب التقدم
+            function calculateProgress() {
+                let completed = 0;
+                checkboxes.forEach(checkbox => {
+                    if (checkbox.checked) completed++;
+                });
+                
+                return {
+                    completed: completed,
+                    total: totalMedications,
+                    percentage: Math.round((completed / totalMedications) * 100)
+                };
+            }
+            
+            // تحديث شريط التقدم
+            function updateProgress() {
+                const progress = calculateProgress();
+                
+                completedCount.textContent = progress.completed;
+                progressPercentage.textContent = `${progress.percentage}%`;
+                progressFill.style.width = `${progress.percentage}%`;
+                progressFill.textContent = `${progress.percentage}%`;
+            }
+            
+            // إعادة تعيين اليوم
+            function resetDay() {
+                if (confirm('هل أنت متأكد من إعادة تعيين جميع الأدوية لهذا اليوم؟')) {
+                    checkboxes.forEach(checkbox => {
+                        checkbox.checked = false;
+                    });
+                    
+                    checkmarks.forEach(checkmark => {
+                        checkmark.classList.remove('checked');
+                    });
+                    
+                    medicationItems.forEach(item => {
+                        item.classList.remove('checked');
+                    });
+                    
+                    updateProgress();
+                    saveData();
+                }
+            }
+            
+            // إعداد التذكيرات
+            function setupReminders(time) {
+                if ('Notification' in window && Notification.permission === 'granted') {
+                    showReminderNotification(time);
+                } else if ('Notification' in window && Notification.permission !== 'denied') {
+                    Notification.requestPermission().then(permission => {
+                        if (permission === 'granted') {
+                            showReminderNotification(time);
+                        }
+                    });
+                } else {
+                    alert('تم ضبط تذكير لأدوية هذا الوقت. يرجى تفعيل الإشعارات في المتصفح للحصول على تذكيرات حقيقية.');
+                }
+            }
+            
+            // عرض إشعار التذكير
+            function showReminderNotification(time) {
+                let title = '';
+                let body = '';
+                
+                switch(time) {
+                    case 'morning':
+                        title = 'تذكير: أدوية الصباح على الريق';
+                        body = 'Examide, Norvasc, Contoloc, Corvid';
+                        break;
+                    case 'breakfast':
+                        title = 'تذكير: أدوية بعد الفطور';
+                        body = 'Aldomet, Eliquis, Covapraviv, Acetyl Cysteine';
+                        break;
+                    case 'lunch-before':
+                        title = 'تذكير: دواء قبل الغداء';
+                        body = 'Forxiga';
+                        break;
+                    case 'dinner-after':
+                        title = 'تذكير: أدوية بعد العشاء';
+                        body = 'Plavix, Lipitor, Moxiflox, Spiriva';
+                        break;
+                    case 'night':
+                        title = 'تذكير: أدوية قبل النوم';
+                        body = 'Eliquis, Aldomet, Covapraviv, Acetyl Cysteine';
+                        break;
+                }
+                
+                new Notification(title, {
+                    body: body,
+                    icon: 'https://cdn-icons-png.flaticon.com/512/206/206875.png'
+                });
+                
+                // تذكير نصي إذا لم تكن الإشعارات مدعومة
+                alert(`${title}: ${body}`);
+            }
+            
+            // إضافة مستمعي الأحداث
+            medicationItems.forEach(item => {
+                const checkmark = item.querySelector('.checkmark');
+                const checkbox = item.querySelector('.medication-checkbox');
+                
+                checkmark.addEventListener('click', function() {
+                    checkbox.checked = !checkbox.checked;
+                    
+                    if (checkbox.checked) {
+                        item.classList.add('checked');
+                        checkmark.classList.add('checked');
+                    } else {
+                        item.classList.remove('checked');
+                        checkmark.classList.remove('checked');
+                    }
+                    
+                    updateProgress();
+                    saveData();
+                });
+            });
+            
+            // إضافة مستمعي الأحداث للأزرار
+            resetButton.addEventListener('click', resetDay);
+            saveButton.addEventListener('click', saveData);
+            
+            // إضافة مستمعي الأحداث لأزرار التذكير
+            setReminderButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const time = this.getAttribute('data-time');
+                    setupReminders(time);
+                });
+            });
+            
+            // تحميل البيانات عند بدء التشغيل
+            loadSavedData();
+            
+            // حفظ البيانات تلقائيًا كل 30 ثانية
+            setInterval(saveData, 30000);
+            
+            // تذكير تلقائي في أول تحميل إذا كان الوقت مناسبًا
+            function checkAutoReminder() {
+                const now = new Date();
+                const hour = now.getHours();
+                
+                // إشعار الصباح بين 6-8 صباحًا
+                if (hour >= 6 && hour < 8) {
+                    const morningMeds = Array.from(medicationItems).filter(item => {
+                        const section = item.closest('.time-section');
+                        const sectionTitle = section.querySelector('h3').textContent;
+                        return sectionTitle.includes('صباحًا على الريق');
+                    });
+                    
+                    const completedMorningMeds = morningMeds.filter(item => {
+                        return item.querySelector('.medication-checkbox').checked;
+                    });
+                    
+                    // إذا لم يتم تناول أي دواء صباحي بعد
+                    if (completedMorningMeds.length === 0) {
+                        setTimeout(() => {
+                            if (confirm('تذكير: هل تناولت أدوية الصباح على الريق؟')) {
+                                morningMeds.forEach(item => {
+                                    const checkbox = item.querySelector('.medication-checkbox');
+                                    checkbox.checked = true;
+                                    item.classList.add('checked');
+                                    item.querySelector('.checkmark').classList.add('checked');
+                                });
+                                updateProgress();
+                                saveData();
+                            }
+                        }, 1000);
+                    }
+                }
+            }
+            
+            // تفعيل التذكير التلقائي بعد ثانيتين من التحميل
+            setTimeout(checkAutoReminder, 2000);
+        });
+    </script>
+</body>
+</html>
